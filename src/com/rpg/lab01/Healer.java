@@ -3,32 +3,22 @@ package com.rpg.lab01;
 public class Healer extends Character {
     private int baseHealingPower;
 
-    public Healer(String name, int level, int maxHP, Weapon weapon, int baseHealingPower) {
-        super(name, level, maxHP, weapon, "Healer");
+    public Healer(String name, int level, int maxHP, int damage, int defense, Weapon weapon, int baseHealingPower) {
+        super(name, level, maxHP, damage, defense, weapon, "Healer");
         this.baseHealingPower = baseHealingPower;
     }
 
     public void heal() {
-        int levelBonus = this.level * 3;
-        int totalHeal = baseHealingPower + levelBonus;
-        this.currentHP = Math.min(this.maxHP, this.currentHP + totalHeal);
-        System.out.println(name + " (Healer) casts a healing spell!");
-        System.out.println("Healing Amount: " + totalHeal + " (Base: " + baseHealingPower + " + Level Bonus: " + levelBonus + ")");
-        System.out.println("Restored " + totalHeal + " HP! Current HP: " + currentHP + "/" + maxHP);
+        if (!isAlive()) return;
+        int totalHeal = baseHealingPower + (level * 2);
+        this.currentHP = Math.min(maxHP, currentHP + totalHeal);
+        System.out.println(name + " heals themselves for " + totalHeal + " HP!");
     }
 
     public void healAlly(Character ally) {
-        int levelBonus = this.level * 3;
-        int totalHeal = baseHealingPower + levelBonus;
+        if (!isAlive()) return;
+        int totalHeal = baseHealingPower + (level * 2);
         ally.currentHP = Math.min(ally.maxHP, ally.currentHP + totalHeal);
-        System.out.println(name + " (Healer) casts healing spell on " + ally.getName() + "!");
-        System.out.println("Healing Amount: " + totalHeal);
-        System.out.println("Restored " + totalHeal + " HP to " + ally.getName() + "! Their HP: " + ally.currentHP);
-    }
-
-    @Override
-    public void displayCharacterDetails() {
-        super.displayCharacterDetails();
-        System.out.println(" Healing Power: " + baseHealingPower);
+        System.out.println(name + " heals " + ally.name + " for " + totalHeal + " HP!");
     }
 }

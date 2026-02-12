@@ -1,38 +1,47 @@
 package com.library.lab01;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Library_Management_System {
-
     public static void main(String[] args) {
-
         System.out.println("\n" + "=".repeat(60));
         System.out.println(" LIBRARY MANAGEMENT SYSTEM - DEMONSTRATION");
         System.out.println("=".repeat(60));
-// Instantiate two book objects based on the provided raw data
 
-        Book book1 = new Book("Java Programming", "John Smith", "123-456", 450.0,
-                "Available");
-        Book book2 = new Book("OOP Concepts", "Will Jones", "999-888", 590.0,
-                "Available");
-// Display initial details of both books
+        List<Book> books = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            books.add(new Book("Java Programming", "John Smith", "123-456", 450.0, "Available"));
+            books.add(new Book("Java Programming", "John Smith", "123-456", 450.0, "Available"));
+        }
+
+        Member member1 = new Member("M001", "Somsak");
+
         System.out.println("\n--- Initial Book Information ---");
-        book1.displayDetails();
-        book2.displayDetails();
-// Demonstrate checkOut() method
+        for (Book book : books) {
+            book.printSummary();
+        }
+
         System.out.println("\n--- Testing checkOut() Method ---");
         System.out.println("\nAttempting to checkout Book 1 and Book 2 (Available):");
-        book1.checkOut();
-        book2.checkOut();
+        books.get(0).checkOut(member1);
+        books.get(1).checkOut(member1);
+
         System.out.println("\nAttempting to checkout Book 2 again (Already Borrowed):");
-        book2.checkOut();
-// Challenge: Attempt to checkout a book that is already borrowed
-// Demonstrate returnBook() method
+        books.get(1).checkOut(member1);
+
         System.out.println("\n--- Testing returnBook() Method ---");
         System.out.println("\nReturning Book 1:");
-        book1.returnBook();
-// Display final details
-        System.out.println("\n--- Final Book Information ---");
-        book1.displayDetails();
-        book2.displayDetails();
-    }
+        books.get(0).returnBook();
 
+        System.out.println("\n--- Challenging Scenario: Borrowing Limit ---");
+        books.get(2).checkOut(member1);
+        books.get(3).checkOut(member1);
+        books.get(4).checkOut(member1); // จะถูกปฏิเสธเพราะยืมครบ 3 เล่มแล้ว (เล่มที่ 2, 3, 4)
+
+        System.out.println("\n--- Final Book Information ---");
+        for (Book book : books) {
+            book.printSummary();
+        }
+    }
 }

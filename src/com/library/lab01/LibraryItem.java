@@ -1,7 +1,7 @@
 package com.library.lab01;
 import java.time.LocalDate;
 
-public class LibraryItem {
+public abstract class LibraryItem {
     protected String title;
     protected String author;
     protected String isbn;
@@ -17,6 +17,7 @@ public class LibraryItem {
     }
 
     public String getTitle() { return title; }
+    public double getPrice() { return price; }
 
     public void checkOut(Member borrower) {
         if (this.status.equals("Available")) {
@@ -25,13 +26,12 @@ public class LibraryItem {
                 this.returnDueDate = LocalDate.now().plusDays(14);
                 borrower.incrementBorrowed();
                 System.out.println("Item '" + title + "' has been checked out successfully.");
-                System.out.println("Item '" + title + "' has been borrowed by " + borrower.getName() + ".");
                 System.out.println("Return Due Date: " + returnDueDate);
             } else {
                 System.out.println("Error: Member " + borrower.getName() + " has reached the borrow limit.");
             }
         } else {
-            System.out.println("Error: Item '" + title + "' is already borrowed and cannot be checked out again.");
+            System.out.println("Error: Item '" + title + "' is already borrowed.");
         }
     }
 
@@ -51,7 +51,5 @@ public class LibraryItem {
         System.out.println(getClass().getSimpleName() + "[Title='" + title + "', Status='" + status + "']");
     }
 
-    public double calculateLateFee(int days) {
-        return 0.0;
-    }
+    public abstract double calculateLateFee(int days);
 }

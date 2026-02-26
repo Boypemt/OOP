@@ -1,6 +1,6 @@
 package com.rpg.lab01;
 
-public class Character {
+public class Character implements Destructible {
     protected String name;
     protected String characterClass;
     protected int level;
@@ -21,30 +21,46 @@ public class Character {
         this.characterClass = characterClass;
     }
 
+    @Override
     public String getName() { return name; }
 
-    public boolean isAlive() { return currentHP > 0; }
+    @Override
+    public boolean isDestroyed() { return currentHP <= 0; }
 
-    public void attack(Character target) {
-        if (!this.isAlive()) {
+    /**
+     * เมธอดรับความเสียหายที่ปรับปรุงให้ตรงกับ Interface
+     */
+    @Override
+    public void takeDamage(int amount) {
+        int finalDamage = Math.max(0, amount - this.defense);
+        this.currentHP = Math.max(0, this.currentHP - finalDamage);
+
+        System.out.println(" 💥 Actual Damage Taken by " + name + ": " + finalDamage);
+        System.out.println(" ❤️ HP: " + currentHP + "/" + maxHP);
+    }
+
+
+    /**
+     * 2. แก้ไขพารามิเตอร์ให้รับ Destructible เพื่อให้โจมตีได้ทั้งคนและวัตถุ
+     */
+    public void attack(Destructible target) {
+        if (this.isDestroyed()) {
             System.out.println(name + " is fainted and cannot attack!");
             return;
         }
 
         int rawDamage = this.damage + weapon.getBaseDamage();
-
         System.out.println(name + " attacks " + target.getName() + "!");
 
-        target.receiveDamage(rawDamage);
+        target.takeDamage(rawDamage);
     }
 
-    public void receiveDamage(int amount) {
-        int finalDamage = Math.max(0, amount - this.defense);
+    public boolean isAlive() { return currentHP > 0; }
 
-        this.currentHP = Math.max(0, this.currentHP - finalDamage);
-
-        System.out.println(" Actual Damage Taken: " + finalDamage);
-        System.out.println(name + "'s HP: " + currentHP + "/" + maxHP);
+    public void receiveHeal(int amount) {
+        if (!isAlive()) return;
+        this.currentHP = Math.min(maxHP, this.currentHP + amount);
+        System.out.println(name + " restored " + amount + " HP!");
     }
 
     public void levelUp() {

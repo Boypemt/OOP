@@ -1,6 +1,6 @@
 package com.rpg.lab01;
 
-public class Character implements Destructible {
+public abstract class Character implements Destructible {
     protected String name;
     protected String characterClass;
     protected int level;
@@ -9,6 +9,7 @@ public class Character implements Destructible {
     protected int damage;
     protected int defense;
     protected Weapon weapon;
+    private Attack attackBehavior;
 
     public Character(String name, int level, int maxHP, int damage, int defense, Weapon weapon, String characterClass) {
         this.name = name;
@@ -19,65 +20,73 @@ public class Character implements Destructible {
         this.defense = defense;
         this.weapon = weapon;
         this.characterClass = characterClass;
+        this.attackBehavior = new BaseAttack();
     }
 
-    @Override
-    public String getName() { return name; }
+    public int getHealthPoints() {
+        return currentHP;
+    }
 
-    @Override
-    public boolean isDestroyed() { return currentHP <= 0; }
+    public int getMaxHealthPoints() {
+        return maxHP;
+    }
 
-    /**
-     * เมธอดรับความเสียหายที่ปรับปรุงให้ตรงกับ Interface
-     */
-    @Override
-    public void takeDamage(int amount) {
-        int finalDamage = Math.max(0, amount - this.defense);
-        this.currentHP = Math.max(0, this.currentHP - finalDamage);
-
-        System.out.println(" 💥 Actual Damage Taken by " + name + ": " + finalDamage);
-        System.out.println(" ❤️ HP: " + currentHP + "/" + maxHP);
+    public void setHealthPoints(int healthPoints) {
+        // ตรวจสอบไม่ให้เลือดเกินค่าสูงสุด หรือต่ำกว่า 0
+        this.currentHP = Math.max(0, Math.min(maxHP, healthPoints));
     }
 
 
-    /**
-     * 2. แก้ไขพารามิเตอร์ให้รับ Destructible เพื่อให้โจมตีได้ทั้งคนและวัตถุ
-     */
+    public void setAttack(Attack newAttack) {
+        this.attackBehavior = newAttack;
+    }
+
+    public Attack getAttack() {
+        return attackBehavior;
+    }
+
     public void attack(Destructible target) {
         if (this.isDestroyed()) {
             System.out.println(name + " is fainted and cannot attack!");
             return;
         }
+        attackBehavior.attack(this, target);
+    }
 
-        int rawDamage = this.damage + weapon.getBaseDamage();
-        System.out.println(name + " attacks " + target.getName() + "!");
+    public String getName() { return name; }
+    public int getDamage() { return damage; }
+    public void setDamage(int damage) { this.damage = damage; }
+    public Weapon getWeapon() { return weapon; }
 
-        target.takeDamage(rawDamage);
+    @Override
+    public boolean isDestroyed() { return currentHP <= 0; }
+
+    @Override
+    public void takeDamage(int amount) {
+        int finalDamage = Math.max(0, amount - this.defense);
+        this.currentHP = Math.max(0, this.currentHP - finalDamage);
+        System.out.println(" 💥 Actual Damage Taken by " + name + ": " + finalDamage);
+        System.out.println(" ❤️ HP: " + currentHP + "/" + maxHP);
     }
 
     public boolean isAlive() { return currentHP > 0; }
-
-    public void receiveHeal(int amount) {
-        if (!isAlive()) return;
-        this.currentHP = Math.min(maxHP, this.currentHP + amount);
-        System.out.println(name + " restored " + amount + " HP!");
-    }
-
-    public void levelUp() {
-        this.level++;
-        this.maxHP += 100;
-        this.currentHP = maxHP;
-        System.out.println(name + " leveled up to Level " + level + "!");
-    }
 
     public void displayCharacterDetails() {
         String status = isAlive() ? "Active" : "Fainted";
         System.out.println("\n--- " + name.toUpperCase() + " (" + characterClass.toUpperCase() + ") ---");
         System.out.println(" Status:         " + status);
-        System.out.println(" Level:          " + level);
         System.out.println(" Health Points:  " + currentHP + "/" + maxHP);
-        System.out.println(" Damage:         " + damage);
-        System.out.println(" Defense:        " + defense);
-        System.out.println(" Weapon:         " + weapon.toString());
+        System.out.println(" Weapon:         " + weapon.getName());
+    }
+
+    public void receiveHeal(int amount) {
+        if (!isAlive()) return; // ถ้าตายแล้วฟื้นฟูไม่ได้
+
+        int newHP = Math.min(maxHP, currentHP + amount);
+        int actualHeal = newHP - currentHP;
+
+        setHealthPoints(newHP);
+
+        System.out.println(" ✨ " + name + " restored " + actualHeal + " HP! (Current HP: " + currentHP + "/" + maxHP + ")");
     }
 }

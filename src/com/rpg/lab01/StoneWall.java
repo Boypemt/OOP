@@ -1,11 +1,35 @@
 package com.rpg.lab01;
 
+
 public class StoneWall implements Destructible {
-    private int hp = 500;
-    public String getName() { return "Stone Wall"; }
+    private String name;
+    private int hp;
+    private String location;
+
+    public StoneWall(String name, int hp, String location) {
+        this.name = name;
+        this.hp = hp;
+        this.location = location;
+    }
+
+    @Override
+    public String getName() { return name; }
+
+    @Override
     public boolean isDestroyed() { return hp <= 0; }
+
+    @Override
     public void takeDamage(int amount) {
-        hp -= (amount / 2);
-        System.out.println(" 🧱 Stone Wall is very sturdy! (HP: " + hp + ")");
+        int finalDamage = amount / 2;
+        this.hp = Math.max(0, this.hp - finalDamage);
+        System.out.println(" 🧱 " + name + " is very sturdy! Damage reduced: " + finalDamage + " (Remaining HP: " + hp + ")");
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void displayWallDetails() {
+        System.out.println("Structure: " + name + " | Location: " + location + " | HP: " + hp + " | Status: " + (isDestroyed() ? "DESTROYED" : "INTACT"));
     }
 }

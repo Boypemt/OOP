@@ -13,10 +13,14 @@ public class HealthPotion implements Consumable {
 
     @Override
     public void use(Character user) {
-        if (uses > 0) {
-            user.receiveHeal(healAmount); // สมมติว่ามีเมธอด receiveHeal ใน Character
+        if (uses > 0 && user.isAlive()) {
+            user.receiveHeal(healAmount);
             uses--;
             System.out.println(" 🧪 " + user.getName() + " used " + name + ". (Remaining: " + uses + ")");
+        } else if (!user.isAlive()) {
+            System.out.println(" ❌ Cannot use " + name + ". " + user.getName() + " is fainted!");
+        } else {
+            System.out.println(" ❌ " + name + " is empty!");
         }
     }
 
